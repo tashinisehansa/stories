@@ -270,7 +270,10 @@ export function buildRoutes(studio) {
     }),
     r('GET', '/api/admin/logs', async (ctx) => {
       parentOnly(ctx);
-      return { logs: log.tail(Number(ctx.query.get('n')) || 200) };
+      const n = Math.min(Math.max(Number(ctx.query.get('n')) || 20, 1), 500);
+      // Autosaves happen every few seconds while she types; leave them out unless asked for.
+      const skip = ctx.query.get('all') ? null : new Set(['story.saved']);
+      return { logs: log.tail(skip ? n * 50 : n).filter((l) => !skip?.has(l.event)).slice(0, n) };
     }),
     r('GET', '/api/admin/agent-token', async (ctx) => {
       parentOnly(ctx);

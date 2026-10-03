@@ -129,7 +129,7 @@ async function load() {
   }
   login.hidden = true;
   dash.hidden = false;
-  const [{ token }, { logs }] = await Promise.all([get('/api/admin/agent-token'), get('/api/admin/logs?n=150')]);
+  const [{ token }, { logs }] = await Promise.all([get('/api/admin/agent-token'), get('/api/admin/logs?n=20')]);
   const s = overview.settings;
   setChildren(dash, 
     el(
@@ -167,6 +167,7 @@ async function load() {
       'section',
       { class: 'card' },
       el('h2', {}, '📝 Recent activity & errors'),
+      el('p', { class: 'small muted' }, 'The last 20 events (autosaves not shown). The full log is in data/logs/app.log.'),
       el(
         'div',
         { class: 'table-scroll' },
