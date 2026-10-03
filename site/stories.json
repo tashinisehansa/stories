@@ -1,4 +1,16 @@
 {
   "generatedBy": "story-studio",
-  "stories": []
+  "stories": [
+    {
+      "id": "morning-rush",
+      "title": "The Morning Rush",
+      "description": "A sleepy boy oversleeps, misses his bus to school, and learns a lesson about going to bed early.",
+      "author": "Tashini",
+      "publishedAt": "2026-10-03T11:50:35.230Z",
+      "readingTimeMinutes": 2,
+      "wordCount": 260,
+      "coverImage": "stories/morning-rush/images/scene-01.webp",
+      "coverAlt": "Malfoy is fast asleep while his alarm clock rings and rings, dreaming that he is flying on a broomstick."
+    }
+  ]
 }

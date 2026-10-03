@@ -1,0 +1,44 @@
+{
+  "id": "morning-rush",
+  "title": "The Morning Rush",
+  "author": "Tashini",
+  "description": "A sleepy boy oversleeps, misses his bus to school, and learns a lesson about going to bed early.",
+  "publishedAt": "2026-10-03T11:50:35.230Z",
+  "updatedAt": "2026-10-03T11:50:35.230Z",
+  "readingTimeMinutes": 2,
+  "wordCount": 260,
+  "coverImage": "images/scene-01.webp",
+  "coverAlt": "Malfoy is fast asleep while his alarm clock rings and rings, dreaming that he is flying on a broomstick.",
+  "hidden": false,
+  "sections": [
+    {
+      "image": "images/scene-01.webp",
+      "alt": "Malfoy is fast asleep while his alarm clock rings and rings, dreaming that he is flying on a broomstick.",
+      "paragraphs": [
+        "One day, Malfoy was sleeping while dreaming of flying on a broomstick. His alarm was blaring, but he was still in a deep sleep. While he was sleeping and the alarm clock went on beeping, it slowly turned off. Malfoy's mother was preparing breakfast."
+      ],
+      "width": 1536,
+      "height": 1024
+    },
+    {
+      "image": "images/scene-02.webp",
+      "alt": "Malfoy's mother comes into his room, surprised to find him still asleep, and shouts that it is time for school.",
+      "paragraphs": [
+        "Malfoy's mother thought that it was strange that he did not come for breakfast as it was his most favourite type of soup, gazpacho. So, Malfoy's mother went to his room. To her surprise, he was still sleeping. Mother shouted, “Malfoy! Hurry up! It is time for school. Your breakf-” Before she could finish her sentence, Malfoy woke up and said, “No time for breakfast mother!” Malfoy immediately went to take a wash and get dressed. After that, Malfoy immediately went downstairs to go to school.",
+        "Malfoy thought, feeling scared, “I really hope I will not be late as then the head master, Professor Dumbledore might give me detention.”"
+      ],
+      "width": 1536,
+      "height": 1024
+    },
+    {
+      "image": "images/scene-03.webp",
+      "alt": "Malfoy runs to the bus stop shouting, but bus 98 has already driven away in a puff of smoke.",
+      "paragraphs": [
+        "He ran to the bus stop. Alas, the bus 98 that Malfoy took to school was already gone. He could see the smoke coming from the bus 98. “Hey, wait for me!” Malfoy shouted, but the bus was too far. Malfoy had to walk back to the bus stop and wait for the next bus to come. He regretted watching videos all night and burning the midnight oil. He thought once again, “I will surely get detention, but I deserve it.”",
+        "Experience is the best teacher, after this day, Malfoy swore never to play games late at night, went to bed early, and became a good child."
+      ],
+      "width": 1536,
+      "height": 1024
+    }
+  ]
+}
