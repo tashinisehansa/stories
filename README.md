@@ -16,7 +16,7 @@ Tashini's browser (home Wi-Fi)          Hermes / Claude Code / any agent
             \                                   /
              Story Studio server (Node, this computer)
                data/  ← drafts, revisions, reviews, picture candidates (private, never committed)
-               │  OpenRouter (story review) · OpenAI Images (pictures)
+               │  DeepSeek or OpenRouter (story review) · OpenAI Images (pictures)
                ▼
              GitHub API: one atomic commit to site/stories/<slug>/ + site/index.html
                ▼
@@ -35,7 +35,7 @@ Tashini's browser (home Wi-Fi)          Hermes / Claude Code / any agent
 
 ```bash
 npm install
-cp .env.example .env        # add OPENROUTER_API_KEY and OPENAI_API_KEY
+cp .env.example .env        # add DEEPSEEK_API_KEY (or OPENROUTER_API_KEY) and OPENAI_API_KEY
 npm start                   # prints the home-network address, e.g. http://192.168.1.144:4321
 ```
 

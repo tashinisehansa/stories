@@ -34,6 +34,14 @@ export function loadConfig(overrides = {}) {
     mockAi: flag('MOCK_AI'),
     mockGithub: flag('MOCK_GITHUB'),
 
+    // Which service checks stories: openrouter | deepseek (auto = whichever has a key, OpenRouter first).
+    reviewProvider: env('REVIEW_PROVIDER', 'auto').toLowerCase(),
+    deepseek: {
+      apiKey: env('DEEPSEEK_API_KEY', env('DEEP_SEEK_API_KEY')),
+      baseUrl: env('DEEPSEEK_BASE_URL', 'https://api.deepseek.com'),
+      model: env('DEEPSEEK_MODEL', 'deepseek-flash'),
+      reasoningTokens: int('DEEPSEEK_REASONING_TOKENS', 8000),
+    },
     openrouter: {
       apiKey: env('OPENROUTER_API_KEY'),
       baseUrl: env('OPENROUTER_BASE_URL', 'https://openrouter.ai/api/v1'),

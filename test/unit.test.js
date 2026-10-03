@@ -110,3 +110,12 @@ test('findLoose tolerates whitespace differences', () => {
   assert.deepEqual(findLoose('a  b\nc', 'b c'), { index: 3, length: 3 });
   assert.equal(findLoose('abc', 'xyz'), null);
 });
+
+test('review provider selection', async () => {
+  const { reviewProviderName } = await import('../src/core/studio.js');
+  const cfg = (reviewProvider, or, ds) => ({ reviewProvider, openrouter: { apiKey: or }, deepseek: { apiKey: ds } });
+  assert.equal(reviewProviderName(cfg('deepseek', 'k1', 'k2')), 'deepseek');
+  assert.equal(reviewProviderName(cfg('openrouter', '', 'k2')), 'openrouter');
+  assert.equal(reviewProviderName(cfg('auto', 'k1', 'k2')), 'openrouter');
+  assert.equal(reviewProviderName(cfg('auto', '', 'k2')), 'deepseek');
+});

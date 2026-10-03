@@ -107,7 +107,12 @@ export function buildRoutes(studio) {
     r('GET', '/api/health', () => ({
       ok: true,
       name: 'story-studio',
-      review: studio.llm.name === 'mock' ? 'mock' : config.openrouter.apiKey ? 'ready' : 'missing OPENROUTER_API_KEY',
+      review:
+        studio.llm.name === 'mock'
+          ? 'mock'
+          : config[studio.llm.name]?.apiKey
+            ? `ready (${studio.llm.name}: ${studio.llm.model})`
+            : `missing ${studio.llm.name === 'deepseek' ? 'DEEPSEEK_API_KEY' : 'OPENROUTER_API_KEY'}`,
       images: studio.imageGen.name === 'mock' ? 'mock' : config.openai.apiKey ? 'ready' : 'missing OPENAI_API_KEY',
       publishing: config.mockGithub ? 'mock' : config.github.repo,
       siteUrl: config.siteUrl,

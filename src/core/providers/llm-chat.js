@@ -1,25 +1,29 @@
 import { StudioError } from '../errors.js';
 
-// OpenAI-compatible chat client. Defaults to OpenRouter, but any compatible
-// endpoint works by changing OPENROUTER_BASE_URL / OPENROUTER_MODEL.
-export function createOpenRouterLlm({ apiKey, baseUrl, model }, { fetchImpl = fetch, timeoutMs = 180_000 } = {}) {
+// OpenAI-compatible chat client used for the story review (OpenRouter, DeepSeek, …).
+// `jsonMode` asks the provider for a JSON object; the reply is still schema-validated.
+export function createChatLlm(
+  { name, apiKey, baseUrl, model, keyName, headers = {}, jsonMode = false, reasoningTokens = 0 },
+  { fetchImpl = fetch, timeoutMs = 180_000 } = {},
+) {
   return {
-    name: 'openrouter',
+    name,
     model,
     async complete({ system, user, maxTokens = 8000, temperature = 0.3 }) {
-      if (!apiKey) throw new StudioError('ai_unavailable', 'OPENROUTER_API_KEY is not set', { status: 503 });
+      if (!apiKey) throw new StudioError('ai_unavailable', `${keyName} is not set`, { status: 503 });
       const res = await fetchImpl(`${baseUrl.replace(/\/$/, '')}/chat/completions`, {
         method: 'POST',
         headers: {
           Authorization: `Bearer ${apiKey}`,
           'Content-Type': 'application/json',
-          'HTTP-Referer': 'https://github.com/tashinisehansa/stories',
-          'X-Title': 'Story Studio',
+          ...headers,
         },
         body: JSON.stringify({
           model,
           temperature,
-          max_tokens: maxTokens,
+          // Reasoning models spend hidden "thinking" tokens from the same budget.
+          max_tokens: maxTokens + reasoningTokens,
+          ...(jsonMode ? { response_format: { type: 'json_object' } } : {}),
           messages: [
             { role: 'system', content: system },
             { role: 'user', content: user },
@@ -40,9 +44,11 @@ export function createOpenRouterLlm({ apiKey, baseUrl, model }, { fetchImpl = fe
       if (body.error) {
         throw new StudioError('ai_unavailable', `LLM error: ${JSON.stringify(body.error).slice(0, 500)}`, { status: 502 });
       }
-      const content = body.choices?.[0]?.message?.content;
+      const choice = body.choices?.[0];
+      const content = choice?.message?.content;
       if (typeof content !== 'string' || !content.trim()) {
-        throw new StudioError('ai_unavailable', 'LLM returned an empty message', { status: 502 });
+        const why = choice?.finish_reason === 'length' ? ' (ran out of tokens before answering)' : '';
+        throw new StudioError('ai_unavailable', `LLM returned an empty message${why}`, { status: 502 });
       }
       return { text: content, model: body.model ?? model };
     },

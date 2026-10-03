@@ -39,7 +39,7 @@ Node ≥ 22, ESM, no build step, and no frontend framework.
   - `createStudio` → `recover()` turns work interrupted by a restart into failed states.
 - **Background jobs.** Review, pictures and publishing run as `JobRunner` jobs. HTTP callers can pass `wait` (in
   seconds) to block. Finishing the review automatically starts picture generation (`onReviewed`).
-- **The AI review** (`review.js`) uses the versioned prompt `prompts/story-review.v1.md`, and its output is
+- **The AI review** (`review.js`) calls an OpenAI-compatible chat API (`providers/llm-chat.js`; `REVIEW_PROVIDER` = deepseek | openrouter, chosen in `studio.js#createReviewLlm`). It uses the versioned prompt `prompts/story-review.v1.md`, and its output is
   validated against `schemas/review.schema.json` with one retry. Invalid output → REVIEW_FAILED.
   - Grammar suggestions are applied one at a time by exact (or whitespace-tolerant) substring replace.
   - `writingIdeas` are kept separate from grammar fixes on purpose.

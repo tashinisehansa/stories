@@ -9,7 +9,7 @@ import { ImageService } from './images.js';
 import { PublishService } from './publish.js';
 import { S } from './states.js';
 import { GitHubRepo, LocalRepo, resolveGithubToken } from './github.js';
-import { createOpenRouterLlm } from './providers/llm-openrouter.js';
+import { createChatLlm } from './providers/llm-chat.js';
 import { createOpenAiImages } from './providers/image-openai.js';
 import { createMockLlm, createMockImages } from './providers/mock.js';
 
@@ -19,7 +19,7 @@ export async function createStudio(config, { llm, imageGen, repo, log } = {}) {
   log ??= createLogger(path.join(config.dataDir, 'logs'), { quiet: config.quietLogs });
   const jobs = new JobRunner(log);
 
-  llm ??= config.mockAi ? createMockLlm() : createOpenRouterLlm(config.openrouter);
+  llm ??= config.mockAi ? createMockLlm() : createReviewLlm(config);
   imageGen ??= config.mockAi ? createMockImages() : createOpenAiImages(config.openai);
   if (!repo) {
     if (config.mockGithub) {
@@ -57,6 +57,26 @@ export async function createStudio(config, { llm, imageGen, repo, log } = {}) {
   const studio = { config, store, log, jobs, stories, review, images, publisher, repo, llm, imageGen, secrets };
   await recover(studio);
   return studio;
+}
+
+export function reviewProviderName(config) {
+  const p = config.reviewProvider;
+  if (p === 'openrouter' || p === 'deepseek') return p;
+  if (config.openrouter.apiKey) return 'openrouter';
+  if (config.deepseek.apiKey) return 'deepseek';
+  return 'openrouter';
+}
+
+function createReviewLlm(config) {
+  if (reviewProviderName(config) === 'deepseek') {
+    return createChatLlm({ name: 'deepseek', keyName: 'DEEPSEEK_API_KEY', jsonMode: true, ...config.deepseek });
+  }
+  return createChatLlm({
+    name: 'openrouter',
+    keyName: 'OPENROUTER_API_KEY',
+    headers: { 'HTTP-Referer': 'https://github.com/tashinisehansa/stories', 'X-Title': 'Story Studio' },
+    ...config.openrouter,
+  });
 }
 
 // Generated on first start and kept in data/secrets.json (gitignored).
