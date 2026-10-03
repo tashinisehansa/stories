@@ -3,24 +3,29 @@
 const DB = 'story-studio';
 const STORE = 'drafts';
 const LS_PREFIX = 'story-studio:draft:';
+const FEEDBACK = 'feedback';
 
 let dbPromise;
 function openDb() {
   if (!('indexedDB' in window)) return Promise.reject(new Error('no indexedDB'));
   dbPromise ??= new Promise((resolve, reject) => {
-    const req = indexedDB.open(DB, 1);
-    req.onupgradeneeded = () => req.result.createObjectStore(STORE, { keyPath: 'id' });
+    const req = indexedDB.open(DB, 2);
+    req.onupgradeneeded = () => {
+      const db = req.result;
+      if (!db.objectStoreNames.contains(STORE)) db.createObjectStore(STORE, { keyPath: 'id' });
+      if (!db.objectStoreNames.contains(FEEDBACK)) db.createObjectStore(FEEDBACK, { keyPath: 'key' });
+    };
     req.onsuccess = () => resolve(req.result);
     req.onerror = () => reject(req.error);
   });
   return dbPromise;
 }
 
-async function tx(mode, fn) {
+async function tx(mode, fn, store = STORE) {
   const db = await openDb();
   return new Promise((resolve, reject) => {
-    const t = db.transaction(STORE, mode);
-    const result = fn(t.objectStore(STORE));
+    const t = db.transaction(store, mode);
+    const result = fn(t.objectStore(store));
     t.oncomplete = () => resolve(result?.result ?? result);
     t.onerror = () => reject(t.error);
     t.onabort = () => reject(t.error);
@@ -90,4 +95,21 @@ export async function syncDirty(putFn) {
     }
   }
   return synced;
+}
+
+// Feedback is also kept on this device so Tashini can read it without the studio.
+export async function cacheFeedback(key, data) {
+  try {
+    await tx('readwrite', (s) => s.put({ key, data, savedAt: new Date().toISOString() }), FEEDBACK);
+  } catch {
+    /* best effort */
+  }
+}
+
+export async function cachedFeedback(key) {
+  try {
+    return (await tx('readonly', (s) => s.get(key), FEEDBACK))?.data ?? null;
+  } catch {
+    return null;
+  }
 }

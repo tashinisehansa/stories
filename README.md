@@ -25,6 +25,8 @@ Tashini's browser (home Wi-Fi)          Hermes / Claude Code / any agent
 
 - **Drafts are local-first.** Each change saves instantly to the browser's IndexedDB, then syncs to the server.
   Writing survives refreshes and Wi-Fi drop-outs. Older versions can be restored.
+- **Feedback is kept.** Every check is saved, and the **💡 Feedback** button on each story shows what she did well,
+  what to improve and which fixes she chose. A copy is also saved on her device. Chinese feedback shows pinyin.
 - **AI never overwrites her writing.** Each grammar fix is "Use Suggestion" or "Keep My Sentence". Style ideas are
   kept separate and optional. Her original story is always one click away.
 - **Nothing goes public without her approval**, including when an agent triggers publishing.

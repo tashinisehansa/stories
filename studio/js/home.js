@@ -42,6 +42,7 @@ function card(s) {
         'div',
         { class: 'actions row' },
         el('a', { class: 'btn btn-small', href }, label),
+        s.hasFeedback ? el('a', { class: 'btn btn-small btn-soft', href: `/feedback.html?id=${s.id}` }, '💡 Feedback') : null,
         s.publishedUrl && s.status === 'PUBLISHED' ? el('a', { class: 'btn btn-small btn-soft', href: s.publishedUrl, target: '_blank', rel: 'noopener' }, 'Read') : null,
       ),
     ),

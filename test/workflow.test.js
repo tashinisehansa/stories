@@ -270,3 +270,38 @@ test('review: suggestions match Chinese text with stray spaces', async (t) => {
   assert.equal(r.applied, true);
   assert.equal((await studio.stories.get(s.id)).content, '他正要去搭电梯上楼去。\n后来他很开心。');
 });
+
+test('feedback: every check is kept, with choices, and Chinese gets pinyin', async (t) => {
+  const { studio, cleanup } = await makeStudio();
+  t.after(cleanup);
+  const id = await storyWithPictures(studio);
+  const first = await studio.review.get(id);
+  await studio.review.decide(id, first.grammarSuggestions[0].id, 'accept');
+
+  // Check again: the first check (with her choice) is archived, not overwritten.
+  await (await studio.review.finish(id, { autoImages: false })).job;
+  const checks = await studio.review.history(id);
+  assert.equal(checks.length, 2);
+  assert.equal(checks[0].key, 'current');
+  assert.match(checks[1].key, /^\d{8}T\d{9}Z$/);
+  assert.equal(checks[1].used, 1);
+  const old = await studio.review.feedback(id, checks[1].key);
+  assert.equal(old.grammarSuggestions[0].status, 'accepted');
+  assert.equal(old.originalRevision, 1);
+  assert.equal(old.pinyin, undefined, 'English feedback has no pinyin');
+  await assert.rejects(studio.review.feedback(id, '../../secrets'), /not found/);
+
+  const zh = await studio.stories.create({ title: '银行', content: '小明要去银行。\n他走得很快，行吗？\n最后他很开心。' });
+  await (await studio.review.finish(zh.id, { autoImages: false })).job;
+  const fb = await studio.review.feedback(zh.id);
+  const key = Object.keys(fb.pinyin).find((k) => k.includes('银行'));
+  assert.ok(key, 'story text in feedback is annotated');
+  const chars = [...key];
+  const py = fb.pinyin[key];
+  assert.equal(py.length, chars.length);
+  assert.equal(py[chars.indexOf('银')], 'yín');
+  assert.equal(py[chars.indexOf('行')], 'háng', 'polyphone read in context');
+
+  await studio.stories.remove(id);
+  assert.deepEqual(await studio.store.list(`review-history/${id}`), []);
+});

@@ -1,5 +1,5 @@
 import { get, post } from './api.js';
-import { el, $, storyIdFromUrl, renderSteps, toast, confirmDialog, poll } from './ui.js';
+import { el, setChildren, $, storyIdFromUrl, renderSteps, toast, confirmDialog, poll } from './ui.js';
 
 const id = storyIdFromUrl();
 const panel = $('#panel');
@@ -53,7 +53,7 @@ function renderPanel() {
       ),
     );
   }
-  panel.replaceChildren(...parts);
+  setChildren(panel, ...parts);
 }
 
 async function publishFlow() {
@@ -67,7 +67,7 @@ async function publishFlow() {
   if (!ok) return;
 
   const steps = el('ul', { class: 'progress-steps', 'aria-live': 'polite' }, PROGRESS.map((p) => el('li', {}, p)));
-  panel.replaceChildren(el('div', { class: 'card' }, el('div', { class: 'working' }, el('span', { class: 'bounce', 'aria-hidden': 'true' }, '🚀')), steps));
+  setChildren(panel, el('div', { class: 'card' }, el('div', { class: 'working' }, el('span', { class: 'bounce', 'aria-hidden': 'true' }, '🚀')), steps));
   let step = 0;
   const lis = [...steps.children];
   const tick = () => {
@@ -115,7 +115,7 @@ async function publishFlow() {
 
 function celebrate(url) {
   const live = el('p', { class: 'muted', role: 'status' }, 'Your story will be on the website in a minute or two…');
-  panel.replaceChildren(
+  setChildren(panel, 
     el(
       'div',
       { class: 'card good celebrate' },
@@ -156,13 +156,13 @@ reloadFrame();
     story = await get(`/api/stories/${id}`);
     $('#heading').textContent = `📖 ${story.title || 'Preview'}`;
     if (story.status === 'DRAFT') {
-      panel.replaceChildren(
+      setChildren(panel, 
         el('div', { class: 'card sun row' }, el('span', {}, 'This is how your story will look. When you are done writing, press “I’m Finished” so we can check it.'), el('a', { class: 'btn btn-small', href: `/editor.html?id=${id}` }, '✏️ Keep writing')),
       );
       return;
     }
     renderPanel();
   } catch (err) {
-    panel.replaceChildren(el('div', { class: 'card oops' }, err.message));
+    setChildren(panel, el('div', { class: 'card oops' }, err.message));
   }
 })();

@@ -137,7 +137,12 @@ export function buildRoutes(studio) {
       const waited = await maybeWait(job, waitSeconds(ctx));
       return { story: await view(ctx.params.id), reviewFinished: waited.finished };
     }),
-    r('GET', '/api/stories/(?<id>[^/]+)/review', async (ctx) => review.get(ctx.params.id)),
+    r('GET', '/api/stories/(?<id>[^/]+)/review', async (ctx) => review.getWithPinyin(ctx.params.id)),
+    r('GET', '/api/stories/(?<id>[^/]+)/feedback', async (ctx) => {
+      const s = await stories.get(ctx.params.id);
+      return { story: { id: s.id, title: s.title, status: s.status }, checks: await review.history(ctx.params.id) };
+    }),
+    r('GET', '/api/stories/(?<id>[^/]+)/feedback/(?<key>[^/]+)', async (ctx) => review.feedback(ctx.params.id, ctx.params.key)),
     r('POST', '/api/stories/(?<id>[^/]+)/suggestions/accept-all', async (ctx) => ({
       results: await review.acceptAll(ctx.params.id),
       story: await view(ctx.params.id),

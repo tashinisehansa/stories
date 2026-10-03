@@ -1,5 +1,5 @@
 import { get, post, del } from './api.js';
-import { el, $, toast, confirmDialog, timeAgo } from './ui.js';
+import { el, setChildren, $, toast, confirmDialog, timeAgo } from './ui.js';
 
 const dash = $('#dashboard');
 const login = $('#login');
@@ -131,7 +131,7 @@ async function load() {
   dash.hidden = false;
   const [{ token }, { logs }] = await Promise.all([get('/api/admin/agent-token'), get('/api/admin/logs?n=150')]);
   const s = overview.settings;
-  dash.replaceChildren(
+  setChildren(dash, 
     el(
       'section',
       { class: 'card' },

@@ -39,11 +39,15 @@ Node ≥ 22, ESM, no build step, and no frontend framework.
   - `createStudio` → `recover()` turns work interrupted by a restart into failed states.
 - **Background jobs.** Review, pictures and publishing run as `JobRunner` jobs. HTTP callers can pass `wait` (in
   seconds) to block. Finishing the review automatically starts picture generation (`onReviewed`).
-- **The AI review** (`review.js`) calls an OpenAI-compatible chat API (`providers/llm-chat.js`; `REVIEW_PROVIDER` = deepseek | openrouter, chosen in `studio.js#createReviewLlm`). It uses the versioned prompt `prompts/story-review.v1.md`, and its output is
+- **The AI review** (`review.js`) calls an OpenAI-compatible chat API (`providers/llm-chat.js`; `REVIEW_PROVIDER` = deepseek | openrouter, chosen in `studio.js#createReviewLlm`). It uses the versioned prompt `prompts/story-review.v2.md`, and its output is
   validated against `schemas/review.schema.json` with one retry. Invalid output → REVIEW_FAILED.
   - Grammar suggestions are applied one at a time by exact (or whitespace-tolerant) substring replace.
   - `writingIdeas` are kept separate from grammar fixes on purpose.
   - If you change the prompt, bump the version (add a new file) so stored reviews stay traceable.
+  - Every check is kept: a new check archives the current one to `data/review-history/<id>/<timestamp>.json`, including
+    Tashini's choices. The feedback page (`studio/feedback.html`) and `GET /api/stories/:id/feedback[/:key]` show them.
+  - Chinese text gets per-character pinyin from the server (`core/pinyin.js`, pinyin-pro, context-aware). The UI shows
+    it as ruby text (`studio/js/feedback-view.js`, shared by the review and feedback pages) with an on/off switch.
 - **Pictures** (`images.js`) combine `prompts/image-style.v1.md` with the story's `characters` list for consistency.
   Each scene gets N candidates, converted to webp. A scene's `beforeParagraph` decides where its picture appears.
 - **Rendering** (`render.js`) is shared by the preview and publishing, so the preview matches the live page. All

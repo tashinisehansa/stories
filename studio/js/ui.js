@@ -18,6 +18,11 @@ export function el(tag, attrs = {}, ...children) {
 
 export const $ = (sel, root = document) => root.querySelector(sel);
 
+// Like node.replaceChildren, but skips null/false (optional sections) instead of printing "null".
+export function setChildren(node, ...children) {
+  node.replaceChildren(...children.flat().filter((c) => c !== null && c !== undefined && c !== false));
+}
+
 export function storyIdFromUrl() {
   return new URLSearchParams(location.search).get('id');
 }
@@ -68,6 +73,7 @@ export function renderSteps(container, id, current) {
     ['check', '🔍', 'Check', `review.html?id=${encodeURIComponent(id)}`],
     ['pictures', '🎨', 'Pictures', `pictures.html?id=${encodeURIComponent(id)}`],
     ['preview', '📖', 'Preview', `preview.html?id=${encodeURIComponent(id)}`],
+    ['feedback', '💡', 'Feedback', `feedback.html?id=${encodeURIComponent(id)}`],
   ];
   container.replaceChildren(
     ...steps.map(([key, icon, label, href]) =>

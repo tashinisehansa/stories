@@ -240,6 +240,26 @@ ul.nice li { margin: 0.35em 0; }
 details > summary { cursor: pointer; font-weight: 800; color: var(--accent-ink); min-height: 44px; display: flex; align-items: center; font-family: var(--font-title); font-size: 1.15rem; }
 .original-text { white-space: pre-wrap; background: var(--paper-2); border-radius: 14px; padding: 14px; }
 
+/* ---- pinyin (ruby text above Chinese characters) ---- */
+/* Each character sits in its own column with its syllable above it, like a children's textbook. */
+ruby {
+  display: inline-flex;
+  flex-direction: column-reverse;
+  align-items: center;
+  vertical-align: bottom;
+  margin: 0.3em 0.1em 0;
+  line-height: 1.25;
+}
+rt {
+  display: block;
+  font-size: 0.6em;
+  line-height: 1.2;
+  color: var(--sky);
+  font-weight: 600;
+  white-space: nowrap;
+}
+.pinyin-toggle[aria-pressed="true"] { background: var(--sky-soft); border-color: var(--sky); color: var(--sky); }
+
 /* ---- loading ---- */
 .working { text-align: center; padding: 40px 10px; }
 .working .bounce { font-size: 3.5rem; display: inline-block; animation: bob 1.2s ease-in-out infinite; }

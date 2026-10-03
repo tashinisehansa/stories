@@ -51,7 +51,7 @@ The parent page (`/admin.html`) shows the agent token and ready-to-paste config.
 ## Tools
 
 `studio_status`, `list_stories`, `get_story`, `create_story`, `update_story`, `finish_story`, `get_review`,
-`decide_suggestion`, `accept_all_suggestions`, `generate_pictures`, `update_scene`, `add_scene`, `remove_scene`,
+`get_feedback_history`, `decide_suggestion`, `accept_all_suggestions`, `generate_pictures`, `update_scene`, `add_scene`, `remove_scene`,
 `wait_for_story`, `preview_link`, `approve_story`*, `publish_story`, `publish_status`, `list_revisions`,
 `restore_revision`.
 

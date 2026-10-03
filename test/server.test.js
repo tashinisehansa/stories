@@ -145,3 +145,16 @@ test('MCP over HTTP exposes the agent tools', async (t) => {
   const noAuth = await fetch(`${base}/mcp`, { method: 'POST', body: '{}', headers: { 'Content-Type': 'application/json' } });
   assert.equal(noAuth.status, 401);
 });
+
+test('feedback API lists checks for the studio and agents', async (t) => {
+  const { request, studio } = await setup(t);
+  const s = await studio.stories.create({ title: 'FB', content: STORY_TEXT });
+  await request('POST', `/api/stories/${s.id}/finish?wait=30`, { body: { autoImages: false } });
+  const list = await request('GET', `/api/stories/${s.id}/feedback`);
+  assert.equal(list.json.checks.length, 1);
+  assert.equal(list.json.story.title, 'FB');
+  const one = await request('GET', `/api/stories/${s.id}/feedback/current`, { token: 'test-agent-token' });
+  assert.ok(one.json.strengths.length);
+  assert.ok((await request('GET', '/api/stories')).json.stories.find((x) => x.id === s.id).hasFeedback);
+  assert.equal((await request('GET', '/feedback.html')).status, 200);
+});

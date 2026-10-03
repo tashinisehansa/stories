@@ -1,5 +1,5 @@
 import { get, post, patch, del } from './api.js';
-import { el, $, storyIdFromUrl, renderSteps, toast, poll, paragraphs, confirmDialog, excerpt } from './ui.js';
+import { el, setChildren, $, storyIdFromUrl, renderSteps, toast, poll, paragraphs, confirmDialog, excerpt } from './ui.js';
 
 const id = storyIdFromUrl();
 const main = $('#main');
@@ -111,7 +111,7 @@ function addSceneForm(paras) {
 function render() {
   const paras = paragraphs(story.content);
   if (!story.scenes.length) {
-    main.replaceChildren(
+    setChildren(main, 
       el('h1', {}, '🎨 Pictures'),
       el(
         'div',
@@ -126,7 +126,7 @@ function render() {
     return;
   }
   const anyBusy = busy(story);
-  main.replaceChildren(
+  setChildren(main, 
     el('h1', {}, `🎨 Pictures for “${story.title || 'my story'}”`),
     anyBusy
       ? el('div', { class: 'card sun row', role: 'status' }, el('span', { class: 'spinner', 'aria-hidden': 'true' }), 'Creating pictures… this can take a minute or two.')
@@ -205,6 +205,6 @@ renderSteps($('#steps'), id, 'pictures');
     render();
     if (busy(story)) watch();
   } catch (err) {
-    main.replaceChildren(el('div', { class: 'card oops' }, err.message));
+    setChildren(main, el('div', { class: 'card oops' }, err.message));
   }
 })();

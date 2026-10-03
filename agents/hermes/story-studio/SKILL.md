@@ -42,6 +42,11 @@ You drive it through the `story_studio` MCP tools (preferred) or the CLI:
    one at a time (rule 2). Mention one `writingTips` item. `writingIdeas` are optional — offer, don't push.
 3. Pictures start automatically after the check. `wait_for_story` (repeat until `stillWorking` is false).
 
+**Looking back at feedback**
+- `get_feedback_history` lists every check of a story (each is kept). Pass `check_key` to read one. Use it to remind
+  her what she did well and what she's practising. For Chinese feedback, the `pinyin` map gives each character's
+  pinyin if she needs help reading it.
+
 **Pictures**
 - Each scene has `candidates` (image URLs) and a `selected` one. To change: `update_scene` with `selected_candidate`.
 - To redraw: `generate_pictures` with `scene_ids`. To change what a picture shows: `update_scene` with

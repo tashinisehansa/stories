@@ -6,7 +6,8 @@ import { ROOT } from '../config.js';
 import { StudioError, notFound } from './errors.js';
 import { S } from './states.js';
 import { loadPrompt, fill } from './prompts.js';
-import { paragraphs, wordCount } from './text.js';
+import { paragraphs, wordCount, hasCjk } from './text.js';
+import { pinyinMap } from './pinyin.js';
 import { assertStoryId, cleanText } from './safety.js';
 
 const ajv = new Ajv({ allErrors: true, strict: false });
@@ -77,6 +78,43 @@ export class ReviewService {
     return r;
   }
 
+  async getWithPinyin(id) {
+    return withPinyin(await this.get(id));
+  }
+
+  // ---- feedback history ------------------------------------------------------
+  // Every check is kept (data/review-history/<id>/) so Tashini can look back at what she learned.
+  async archiveCurrent(id) {
+    const current = await this.store.read(this.rel(id));
+    if (!current) return;
+    await this.store.write(`review-history/${id}/${historyKey(current.generatedAt)}.json`, current);
+  }
+
+  async history(id) {
+    assertStoryId(id);
+    const entries = [];
+    const current = await this.store.read(this.rel(id));
+    if (current) entries.push({ key: 'current', ...describe(current) });
+    const files = (await this.store.list(`review-history/${id}`)).filter((f) => f.endsWith('.json')).sort().reverse();
+    for (const f of files) {
+      const r = await this.store.read(`review-history/${id}/${f}`);
+      if (r && r.generatedAt !== current?.generatedAt) entries.push({ key: f.slice(0, -5), ...describe(r) });
+    }
+    return entries;
+  }
+
+  // One check (current or archived), with pinyin for Chinese text.
+  async feedback(id, key = 'current') {
+    let review;
+    if (key === 'current') review = await this.get(id);
+    else {
+      if (!/^\d{8}T\d{9}Z$/.test(key)) throw notFound('Feedback');
+      review = await this.store.read(`review-history/${assertStoryId(id)}/${key}.json`);
+      if (!review) throw notFound('Feedback');
+    }
+    return withPinyin(review);
+  }
+
   // "I'm Finished": snapshot the original, move to REVIEWING and start the AI check.
   async finish(id, { autoImages = true } = {}) {
     const story = await this.stories.get(id);
@@ -141,6 +179,7 @@ export class ReviewService {
       const review = this.normalize(parsed.data, story, paras);
       const record = {
         storyId: id,
+        originalRevision: story.review?.originalRevision ?? null,
         reviewVersion: prompt.version,
         model: reply.model ?? this.llm.model,
         provider: this.llm.name,
@@ -148,6 +187,7 @@ export class ReviewService {
         reviewedRevision: story.revision,
         ...review,
       };
+      await this.archiveCurrent(id);
       await this.store.write(this.rel(id), record);
 
       const updated = await this.stories.mutate(id, (s) => {
@@ -272,4 +312,23 @@ export class ReviewService {
     }
     return results;
   }
+}
+
+function historyKey(iso) {
+  return String(iso ?? new Date().toISOString()).replace(/[-:.]/g, '');
+}
+
+function describe(r) {
+  const g = r.grammarSuggestions ?? [];
+  return {
+    generatedAt: r.generatedAt,
+    reviewVersion: r.reviewVersion,
+    suggestions: g.length,
+    used: g.filter((x) => x.status === 'accepted').length,
+    kept: g.filter((x) => x.status === 'kept').length,
+  };
+}
+
+function withPinyin(review) {
+  return hasCjk(JSON.stringify(review)) ? { ...review, pinyin: pinyinMap(review) } : review;
 }

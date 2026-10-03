@@ -112,6 +112,16 @@ export function toolDefinitions(client) {
       run: async ({ story_id }) => client.get(`/api/stories/${enc(story_id)}/review`),
     },
     {
+      name: 'get_feedback_history',
+      description:
+        "Tashini's saved feedback for a story — every check is kept so she can look back at what to improve. Without check_key: lists the checks. With check_key ('current' or a key from the list): that check's feedback. Chinese feedback includes a `pinyin` map (text → per-character pinyin).",
+      input: { story_id: id, check_key: z.string().optional() },
+      run: async ({ story_id, check_key }) =>
+        check_key
+          ? client.get(`/api/stories/${enc(story_id)}/feedback/${enc(check_key)}`)
+          : client.get(`/api/stories/${enc(story_id)}/feedback`),
+    },
+    {
       name: 'decide_suggestion',
       description:
         'Apply Tashini\'s choice for one grammar suggestion: "accept" (Use Suggestion) or "keep" (Keep My Sentence). Ask her first; never accept on her behalf without asking.',

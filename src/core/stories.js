@@ -172,6 +172,7 @@ export class StoryService {
     });
     await this.store.remove(`revisions/${id}`);
     await this.store.remove(`reviews/${id}.json`);
+    await this.store.remove(`review-history/${id}`);
     await this.store.remove(`images/${id}`);
   }
 
@@ -246,6 +247,7 @@ export function summarize(s) {
     publishedUrl: s.publishedUrl,
     hidden: Boolean(s.hidden),
     approved: Boolean(s.approvedAt),
+    hasFeedback: Boolean(s.review?.generatedAt),
   };
 }
 
