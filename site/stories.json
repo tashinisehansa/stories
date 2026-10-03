@@ -2,6 +2,17 @@
   "generatedBy": "story-studio",
   "stories": [
     {
+      "id": "story",
+      "title": "小明帮助别人",
+      "description": "小明放学回家时，帮助一位驼背的老爷爷把沉重的袋子搬上楼，心里甜滋滋的。",
+      "author": "Tashini",
+      "publishedAt": "2026-10-03T14:56:02.782Z",
+      "readingTimeMinutes": 2,
+      "wordCount": 343,
+      "coverImage": "stories/story/images/scene-01.webp",
+      "coverAlt": "放学铃响了，小明和同学们背着书包，轻快地走出校门口。"
+    },
+    {
       "id": "morning-rush",
       "title": "The Morning Rush",
       "description": "A sleepy boy oversleeps, misses his bus to school, and learns a lesson about going to bed early.",
