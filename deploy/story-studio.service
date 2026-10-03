@@ -1,0 +1,20 @@
+# systemd user service: keeps Story Studio running on this computer.
+# Install:  mkdir -p ~/.config/systemd/user && cp deploy/story-studio.service ~/.config/systemd/user/
+#           systemctl --user daemon-reload && systemctl --user enable --now story-studio
+#           loginctl enable-linger $USER   # keep running when nobody is logged in
+[Unit]
+Description=Tashini's Story Studio
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+WorkingDirectory=%h/projects/tashini/stories
+ExecStart=/usr/bin/env node src/server.js
+Restart=on-failure
+RestartSec=5
+Environment=NODE_ENV=production
+Environment=PATH=%h/.local/bin:/usr/local/bin:/usr/bin:/bin
+
+[Install]
+WantedBy=default.target

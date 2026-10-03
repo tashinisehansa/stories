@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>Preview — Story Studio</title>
+  <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="/css/studio.css">
+  <script type="module" src="/js/preview.js"></script>
+</head>
+<body>
+  <div class="wrap">
+    <nav class="top" aria-label="Story steps">
+      <a class="home-link" href="/">← My Stories</a>
+      <ul class="steps" id="steps"></ul>
+    </nav>
+    <main>
+      <div class="row">
+        <h1 id="heading">📖 Preview</h1>
+      </div>
+      <div id="panel"></div>
+      <iframe id="frame" class="preview-frame" title="Preview of your story as readers will see it"></iframe>
+      <div class="row" id="tools">
+        <a class="btn btn-soft btn-small" id="edit-link" href="#">✏️ Edit Story</a>
+        <a class="btn btn-soft btn-small" id="review-link" href="#">🔍 Review Feedback</a>
+        <a class="btn btn-soft btn-small" id="pictures-link" href="#">🎨 Change Pictures</a>
+      </div>
+    </main>
+  </div>
+</body>
+</html>

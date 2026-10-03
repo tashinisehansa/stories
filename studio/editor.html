@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>Write — Story Studio</title>
+  <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="/css/studio.css">
+  <script type="module" src="/js/editor.js"></script>
+</head>
+<body>
+  <div class="narrow">
+    <nav class="top" aria-label="Story steps">
+      <a class="home-link" href="/">← My Stories</a>
+      <ul class="steps" id="steps"></ul>
+    </nav>
+
+    <p class="card sky" id="state-note" hidden></p>
+
+    <main class="card">
+      <input id="title" class="title-input" type="text" maxlength="120" placeholder="My story title" autocomplete="off" aria-label="Story title">
+      <textarea id="content" class="writing" placeholder="Start writing your story here…" aria-label="Your story" spellcheck="true"></textarea>
+    </main>
+
+    <div class="editor-bar" role="group" aria-label="Story tools">
+      <span id="save-status" class="save-status" role="status" aria-live="polite">✓ Saved</span>
+      <span class="counts" id="counts">0 words</span>
+      <span class="spacer"></span>
+      <button type="button" class="icon-btn btn-soft" id="undo" aria-label="Undo" title="Undo">↶</button>
+      <button type="button" class="icon-btn btn-soft" id="redo" aria-label="Redo" title="Redo">↷</button>
+      <button type="button" class="btn-soft btn-small" id="history">🕘 Older versions</button>
+      <button type="button" class="btn-soft btn-small" id="save">Save Draft</button>
+      <button type="button" class="btn-green" id="finish">I'm Finished ✨</button>
+    </div>
+  </div>
+</body>
+</html>

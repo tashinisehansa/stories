@@ -1,0 +1,8 @@
+{
+  "mcpServers": {
+    "story_studio": {
+      "command": "node",
+      "args": ["src/mcp.js"]
+    }
+  }
+}

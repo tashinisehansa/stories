@@ -1,0 +1,95 @@
+{
+  "$id": "https://story-studio.local/review.schema.json",
+  "type": "object",
+  "additionalProperties": true,
+  "required": [
+    "summary",
+    "strengths",
+    "improvements",
+    "writingTips",
+    "grammarSuggestions",
+    "writingIdeas",
+    "characters",
+    "scenes"
+  ],
+  "properties": {
+    "summary": { "type": "string", "minLength": 1, "maxLength": 600 },
+    "suggestedTitle": { "type": ["string", "null"], "maxLength": 120 },
+    "suggestedDescription": { "type": ["string", "null"], "maxLength": 300 },
+    "correctedStory": { "type": ["string", "null"] },
+    "strengths": { "type": "array", "minItems": 1, "maxItems": 6, "items": { "type": "string", "minLength": 1, "maxLength": 400 } },
+    "improvements": { "type": "array", "maxItems": 6, "items": { "type": "string", "minLength": 1, "maxLength": 400 } },
+    "writingTips": { "type": "array", "minItems": 1, "maxItems": 2, "items": { "type": "string", "minLength": 1, "maxLength": 400 } },
+    "structureFeedback": { "type": ["string", "null"], "maxLength": 800 },
+    "grammarSuggestions": {
+      "type": "array",
+      "maxItems": 40,
+      "items": {
+        "type": "object",
+        "required": ["original", "suggestion", "explanation", "type"],
+        "properties": {
+          "original": { "type": "string", "minLength": 1, "maxLength": 600 },
+          "suggestion": { "type": "string", "minLength": 1, "maxLength": 600 },
+          "explanation": { "type": "string", "minLength": 1, "maxLength": 400 },
+          "type": { "enum": ["grammar", "spelling", "punctuation", "sentence"] }
+        }
+      }
+    },
+    "writingIdeas": {
+      "type": "array",
+      "maxItems": 8,
+      "items": {
+        "type": "object",
+        "required": ["idea"],
+        "properties": {
+          "idea": { "type": "string", "minLength": 1, "maxLength": 400 },
+          "original": { "type": ["string", "null"], "maxLength": 600 },
+          "example": { "type": ["string", "null"], "maxLength": 600 }
+        }
+      }
+    },
+    "vocabularySuggestions": {
+      "type": "array",
+      "maxItems": 8,
+      "items": {
+        "type": "object",
+        "required": ["word", "alternatives"],
+        "properties": {
+          "word": { "type": "string", "minLength": 1, "maxLength": 60 },
+          "alternatives": { "type": "array", "minItems": 1, "maxItems": 5, "items": { "type": "string", "maxLength": 60 } },
+          "explanation": { "type": ["string", "null"], "maxLength": 300 }
+        }
+      }
+    },
+    "characters": {
+      "type": "array",
+      "maxItems": 8,
+      "items": {
+        "type": "object",
+        "required": ["name", "description"],
+        "properties": {
+          "name": { "type": "string", "minLength": 1, "maxLength": 80 },
+          "description": { "type": "string", "minLength": 1, "maxLength": 400 }
+        }
+      }
+    },
+    "scenes": {
+      "type": "array",
+      "minItems": 1,
+      "maxItems": 5,
+      "items": {
+        "type": "object",
+        "required": ["sceneNumber", "description", "imagePrompt", "beforeParagraph"],
+        "properties": {
+          "sceneNumber": { "type": "integer", "minimum": 1, "maximum": 5 },
+          "title": { "type": ["string", "null"], "maxLength": 80 },
+          "description": { "type": "string", "minLength": 1, "maxLength": 500 },
+          "imagePrompt": { "type": "string", "minLength": 1, "maxLength": 1200 },
+          "beforeParagraph": { "type": "integer", "minimum": 0 },
+          "characters": { "type": "array", "items": { "type": "string" } }
+        }
+      }
+    },
+    "safetyConcerns": { "type": "array", "maxItems": 10, "items": { "type": "string", "maxLength": 400 } }
+  }
+}

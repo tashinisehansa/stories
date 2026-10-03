@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>Tashini's Story Studio</title>
+  <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+  <link rel="manifest" href="/manifest.webmanifest">
+  <meta name="theme-color" content="#e8743b">
+  <link rel="stylesheet" href="/css/studio.css">
+  <script type="module" src="/js/home.js"></script>
+</head>
+<body>
+  <main class="wrap">
+    <header class="hero">
+      <h1>📚 Tashini's Story Studio</h1>
+      <p>What story will you write today?</p>
+      <a class="btn btn-big" href="/editor.html">＋ New Story</a>
+    </header>
+
+    <section aria-labelledby="h-drafts">
+      <h2 id="h-drafts">✏️ My Drafts</h2>
+      <ul class="story-grid" id="drafts"></ul>
+    </section>
+
+    <section aria-labelledby="h-working">
+      <h2 id="h-working">🎨 Getting Ready</h2>
+      <ul class="story-grid" id="working"></ul>
+    </section>
+
+    <section aria-labelledby="h-published">
+      <h2 id="h-published">📖 Published</h2>
+      <ul class="story-grid" id="published"></ul>
+    </section>
+
+    <footer class="row center small muted">
+      <a id="site-link" href="https://tashinisehansa.github.io/stories/" rel="noopener" target="_blank">🌍 My story website</a>
+      <span aria-hidden="true">·</span>
+      <a href="/admin.html">Grown-ups</a>
+    </footer>
+  </main>
+</body>
+</html>

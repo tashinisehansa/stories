@@ -1,0 +1,36 @@
+{
+  "$id": "https://story-studio.local/story.schema.json",
+  "title": "Published story (site/stories/<slug>/story.json)",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["id", "title", "author", "description", "publishedAt", "readingTimeMinutes", "wordCount", "coverImage", "sections"],
+  "properties": {
+    "id": { "type": "string", "pattern": "^[a-z0-9](?:[a-z0-9-]{0,58}[a-z0-9])?$" },
+    "title": { "type": "string", "minLength": 1, "maxLength": 120 },
+    "author": { "type": "string", "minLength": 1, "maxLength": 60 },
+    "description": { "type": "string", "maxLength": 300 },
+    "publishedAt": { "type": "string", "format": "date-time" },
+    "updatedAt": { "type": "string", "format": "date-time" },
+    "readingTimeMinutes": { "type": "integer", "minimum": 1 },
+    "wordCount": { "type": "integer", "minimum": 0 },
+    "coverImage": { "type": ["string", "null"], "pattern": "^images/scene-\\d{2}\\.webp$" },
+    "coverAlt": { "type": ["string", "null"] },
+    "hidden": { "type": "boolean" },
+    "sections": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["image", "paragraphs"],
+        "properties": {
+          "image": { "type": ["string", "null"], "pattern": "^images/scene-\\d{2}\\.webp$" },
+          "alt": { "type": "string" },
+          "width": { "type": "integer", "minimum": 1 },
+          "height": { "type": "integer", "minimum": 1 },
+          "paragraphs": { "type": "array", "items": { "type": "string", "minLength": 1 } }
+        }
+      }
+    }
+  }
+}

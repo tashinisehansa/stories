@@ -1,0 +1,9 @@
+{
+  "name": "Tashini's Story Studio",
+  "short_name": "Story Studio",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#fffaf0",
+  "theme_color": "#e8743b",
+  "icons": [{ "src": "/favicon.svg", "sizes": "any", "type": "image/svg+xml" }]
+}
