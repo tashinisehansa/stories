@@ -50,7 +50,7 @@ export function createChatLlm(
         const why = choice?.finish_reason === 'length' ? ' (ran out of tokens before answering)' : '';
         throw new StudioError('ai_unavailable', `LLM returned an empty message${why}`, { status: 502 });
       }
-      return { text: content, model: body.model ?? model };
+      return { text: content, model: body.model ?? model, finishReason: choice?.finish_reason ?? null };
     },
   };
 }

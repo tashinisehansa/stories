@@ -1,5 +1,5 @@
 import { get, post, patch, del } from './api.js';
-import { el, $, storyIdFromUrl, renderSteps, toast, poll, paragraphs, confirmDialog } from './ui.js';
+import { el, $, storyIdFromUrl, renderSteps, toast, poll, paragraphs, confirmDialog, excerpt } from './ui.js';
 
 const id = storyIdFromUrl();
 const main = $('#main');
@@ -13,7 +13,7 @@ function placementSelect(scene, paras) {
   const select = el(
     'select',
     { id: `place-${scene.id}` },
-    paras.map((p, i) => el('option', { value: String(i), selected: i === scene.beforeParagraph ? true : null }, `Before part ${i + 1}: “${p.split(/\s+/).slice(0, 7).join(' ')}…”`)),
+    paras.map((p, i) => el('option', { value: String(i), selected: i === scene.beforeParagraph ? true : null }, `Before part ${i + 1}: “${excerpt(p)}”`)),
   );
   select.addEventListener('change', () => update(scene, { beforeParagraph: Number(select.value) }));
   return el('div', { class: 'field' }, el('label', { for: `place-${scene.id}` }, 'Where should this picture go?'), select);
@@ -79,7 +79,7 @@ function sceneCard(scene, index, paras) {
 
 function addSceneForm(paras) {
   const desc = el('textarea', { id: 'new-desc', rows: '2', maxlength: '500', placeholder: 'e.g. Maya and the dragon flying over the village at sunset' });
-  const place = el('select', { id: 'new-place' }, paras.map((p, i) => el('option', { value: String(i) }, `Before part ${i + 1}: “${p.split(/\s+/).slice(0, 7).join(' ')}…”`)));
+  const place = el('select', { id: 'new-place' }, paras.map((p, i) => el('option', { value: String(i) }, `Before part ${i + 1}: “${excerpt(p)}”`)));
   return el(
     'details',
     { class: 'card soft' },

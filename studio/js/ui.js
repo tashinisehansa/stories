@@ -86,8 +86,25 @@ export function timeAgo(iso) {
   return new Date(iso).toLocaleDateString(undefined, { day: 'numeric', month: 'short', year: 'numeric' });
 }
 
+const CJK = /[\p{Script=Han}\p{Script=Hiragana}\p{Script=Katakana}\p{Script=Hangul}]/gu;
+
+// Same rules as src/core/text.js: each Chinese/Japanese/Korean character counts as a word.
 export function wordCount(text) {
-  return (String(text ?? '').match(/[\p{L}\p{N}][\p{L}\p{N}'’-]*/gu) ?? []).length;
+  const t = String(text ?? '');
+  const cjk = t.match(CJK)?.length ?? 0;
+  return cjk + (t.replace(CJK, ' ').match(/[\p{L}\p{N}][\p{L}\p{N}'’-]*/gu) ?? []).length;
+}
+
+// Short excerpt that works with or without spaces between words.
+export function excerpt(text, n = 7) {
+  const t = String(text ?? '').trim();
+  if (CJK.test(t)) {
+    CJK.lastIndex = 0;
+    const c = t.replace(/\s+/g, '');
+    return c.length > n * 2 ? `${c.slice(0, n * 2)}…` : c;
+  }
+  const w = t.split(/\s+/);
+  return w.length > n ? `${w.slice(0, n).join(' ')}…` : t;
 }
 
 export function paragraphs(text) {

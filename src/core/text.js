@@ -9,9 +9,18 @@ export function paragraphs(content) {
     .filter(Boolean);
 }
 
+// Chinese/Japanese/Korean have no spaces between words, so each character counts as one.
+const CJK = /[\p{Script=Han}\p{Script=Hiragana}\p{Script=Katakana}\p{Script=Hangul}]/gu;
+
+export function hasCjk(text) {
+  return /[\p{Script=Han}\p{Script=Hiragana}\p{Script=Katakana}\p{Script=Hangul}]/u.test(String(text ?? ''));
+}
+
 export function wordCount(content) {
-  const m = String(content ?? '').match(/[\p{L}\p{N}][\p{L}\p{N}'’-]*/gu);
-  return m ? m.length : 0;
+  const text = String(content ?? '');
+  const cjk = text.match(CJK)?.length ?? 0;
+  const other = text.replace(CJK, ' ').match(/[\p{L}\p{N}][\p{L}\p{N}'’-]*/gu)?.length ?? 0;
+  return cjk + other;
 }
 
 // Young readers read slower than adults; 150 wpm keeps estimates honest.
@@ -33,6 +42,11 @@ export function slugify(title) {
 }
 
 export function firstWords(text, n = 8) {
-  const words = String(text ?? '').split(/\s+/).filter(Boolean);
+  const t = String(text ?? '');
+  if (hasCjk(t)) {
+    const compact = t.replace(/\s+/g, '');
+    return compact.slice(0, n * 2) + (compact.length > n * 2 ? '…' : '');
+  }
+  const words = t.split(/\s+/).filter(Boolean);
   return words.slice(0, n).join(' ') + (words.length > n ? '…' : '');
 }

@@ -11,6 +11,14 @@ test('paragraphs split on any newline and drop blanks', () => {
   assert.deepEqual(paragraphs(''), []);
 });
 
+test('Chinese text: each character counts; excerpts work without spaces', async () => {
+  const { firstWords } = await import('../src/core/text.js');
+  assert.equal(wordCount('小明放学了。'), 5);
+  assert.equal(wordCount('Maya 和 cat'), 3);
+  assert.equal(readingTimeMinutes('字'.repeat(450)), 3);
+  assert.equal(firstWords('小明 放学后连忙回到家，他很开心', 3), '小明放学后连…');
+});
+
 test('wordCount and reading time', () => {
   assert.equal(wordCount("Maya's dragon flew — fast! 123"), 5);
   assert.equal(wordCount(''), 0);
@@ -109,6 +117,7 @@ test('AI review output is validated', () => {
 test('findLoose tolerates whitespace differences', () => {
   assert.deepEqual(findLoose('a  b\nc', 'b c'), { index: 3, length: 3 });
   assert.equal(findLoose('abc', 'xyz'), null);
+  assert.deepEqual(findLoose('他正要去打电梯 到上楼去。', '他正要去打电梯到上楼去'), { index: 0, length: 12 });
 });
 
 test('review provider selection', async () => {

@@ -41,17 +41,15 @@ export function parseReview(text) {
   return { ok: true, data };
 }
 
-// Locate `needle` in `haystack`, tolerating differences in whitespace.
+// Locate `needle` in `haystack`, tolerating differences in whitespace — including
+// stray spaces between Chinese characters, which children often type by accident.
 export function findLoose(haystack, needle) {
   const exact = haystack.indexOf(needle);
   if (exact !== -1) return { index: exact, length: needle.length };
-  const pattern = needle
-    .trim()
-    .split(/\s+/)
-    .map((w) => w.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'))
-    .join('\\s+');
-  if (!pattern) return null;
-  const m = new RegExp(pattern).exec(haystack);
+  const chars = [...needle.replace(/\s+/g, '')];
+  if (!chars.length) return null;
+  const pattern = chars.map((c) => c.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')).join('\\s*');
+  const m = new RegExp(pattern, 'u').exec(haystack);
   return m ? { index: m.index, length: m[0].length } : null;
 }
 
@@ -67,6 +65,15 @@ export class ReviewService {
   async get(id) {
     const r = await this.store.read(this.rel(id));
     if (!r) throw notFound('Review');
+    // A suggestion is "stale" only while its sentence can't be found in the current text.
+    const story = await this.stories.get(id).catch(() => null);
+    if (story) {
+      for (const g of r.grammarSuggestions) {
+        const found = Boolean(findLoose(story.content, g.original));
+        if (g.status === 'stale' && found) g.status = 'pending';
+        else if (g.status === 'pending' && !found) g.status = 'stale';
+      }
+    }
     return r;
   }
 
@@ -97,7 +104,7 @@ export class ReviewService {
   async runReview(id, { autoImages }) {
     const story = await this.stories.get(id);
     const paras = paragraphs(story.content);
-    const prompt = loadPrompt('story-review.v1');
+    const prompt = loadPrompt('story-review.v2');
     const system = fill(prompt.template, {
       author: story.author || this.config.authorName,
       sceneRange: sceneRangeFor(wordCount(story.content)),
@@ -110,16 +117,19 @@ export class ReviewService {
     ].join('\n');
     const context = { title: story.title, paragraphs: paras, author: story.author };
     // Reply holds the corrected story plus feedback, so size the budget to the story.
-    const maxTokens = Math.min(8000, 2000 + wordCount(story.content) * 3);
+    // (wordCount counts each Chinese character, so CJK stories get a matching budget.)
+    const maxTokens = Math.min(12_000, 2500 + wordCount(story.content) * 4);
 
     try {
       let reply = await this.llm.complete({ system, user, context, maxTokens });
       let parsed = parseReview(reply.text);
       if (!parsed.ok) {
-        this.log.warn('review.invalid_output', { id, errors: parsed.errors.slice(0, 8) });
+        const truncated = reply.finishReason === 'length';
+        this.log.warn('review.invalid_output', { id, truncated, maxTokens, errors: parsed.errors.slice(0, 8) });
         reply = await this.llm.complete({
           system,
-          maxTokens,
+          // A cut-off reply needs more room, not a second identical attempt.
+          maxTokens: truncated ? Math.min(maxTokens * 2, 16_000) : maxTokens,
           user: `${user}\n\nYour previous reply was not valid. Problems: ${parsed.errors.slice(0, 8).join('; ')}.\nReturn ONLY the JSON object described in the instructions.`,
           context,
         });

@@ -50,7 +50,7 @@ test('review: suggestions, accept/keep, original preserved, invalid AI rejected'
   const story = await studio.stories.get(id);
   assert.equal(story.status, 'REVIEWING');
   assert.equal(story.review.status, 'done');
-  assert.equal(story.review.reviewVersion, 'story-review/1.0');
+  assert.equal(story.review.reviewVersion, 'story-review/2.0');
 
   const review = await studio.review.get(id);
   assert.ok(review.strengths.length >= 1);
@@ -229,4 +229,44 @@ test('restart recovery turns interrupted work into retryable failures', async (t
   const after = await again.stories.get(s.id);
   assert.equal(after.status, 'REVIEW_FAILED');
   assert.equal(after.review.status, 'failed');
+});
+
+test('review: a cut-off AI reply is retried with a bigger budget', async (t) => {
+  const budgets = [];
+  const real = createMockLlm();
+  const llm = {
+    name: 'mock',
+    model: 'mock-reviewer',
+    async complete(args) {
+      budgets.push(args.maxTokens);
+      const r = await real.complete(args);
+      // First reply is truncated mid-array, like a model hitting max_tokens.
+      return budgets.length === 1 ? { ...r, text: r.text.slice(0, Math.floor(r.text.length / 2)), finishReason: 'length' } : r;
+    },
+  };
+  const { studio, cleanup } = await makeStudio({ llm });
+  t.after(cleanup);
+  const zh = '小明放学后连忙回到家。\n他正要去打电梯 到上楼去。\n后来他帮助了一位老爷爷。';
+  const s = await studio.stories.create({ title: '小明帮助别人', content: zh });
+  await (await studio.review.finish(s.id)).job;
+  assert.equal(budgets.length, 2);
+  assert.ok(budgets[1] > budgets[0], 'retry gets more room');
+  assert.ok(budgets[0] >= 2500 + 30 * 4, 'Chinese characters count toward the budget');
+  assert.equal((await studio.stories.get(s.id)).review.status, 'done');
+});
+
+test('review: suggestions match Chinese text with stray spaces', async (t) => {
+  const { studio, cleanup } = await makeStudio();
+  t.after(cleanup);
+  const s = await studio.stories.create({ title: '小明', content: '他正要去打电梯 到上楼去。\n后来他很开心。' });
+  await (await studio.review.finish(s.id)).job;
+  await studio.store.update(`reviews/${s.id}.json`, (r) => {
+    r.grammarSuggestions = [{ id: 'gzh0001', type: 'grammar', original: '他正要去打电梯到上楼去', suggestion: '他正要去搭电梯上楼去', explanation: '坐电梯要用“搭”。', status: 'stale' }];
+    return r;
+  });
+  const review = await studio.review.get(s.id);
+  assert.equal(review.grammarSuggestions[0].status, 'pending', 'found despite the stray space');
+  const r = await studio.review.decide(s.id, 'gzh0001', 'accept');
+  assert.equal(r.applied, true);
+  assert.equal((await studio.stories.get(s.id)).content, '他正要去搭电梯上楼去。\n后来他很开心。');
 });
