@@ -238,8 +238,11 @@ export function buildRoutes(studio) {
     r('POST', '/api/admin/logout', async (ctx) => send(ctx.res, 200, { ok: true }, { 'Set-Cookie': clearAdminCookie })),
     r('GET', '/api/admin/overview', async (ctx) => {
       parentOnly(ctx);
+      // Parents see the technical reason a step failed; the child UI never gets this.
+      const list = await stories.list();
+      for (const item of list) item.lastError = (await stories.get(item.id)).lastError ?? null;
       return {
-        stories: await stories.list(),
+        stories: list,
         usage: await studio.store.read('usage.json', {}),
         settings: {
           reviewModel: `${studio.llm.name}:${studio.llm.model}`,

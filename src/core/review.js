@@ -109,14 +109,17 @@ export class ReviewService {
       ...paras.map((p, i) => `[${i}] ${p}`),
     ].join('\n');
     const context = { title: story.title, paragraphs: paras, author: story.author };
+    // Reply holds the corrected story plus feedback, so size the budget to the story.
+    const maxTokens = Math.min(8000, 2000 + wordCount(story.content) * 3);
 
     try {
-      let reply = await this.llm.complete({ system, user, context });
+      let reply = await this.llm.complete({ system, user, context, maxTokens });
       let parsed = parseReview(reply.text);
       if (!parsed.ok) {
         this.log.warn('review.invalid_output', { id, errors: parsed.errors.slice(0, 8) });
         reply = await this.llm.complete({
           system,
+          maxTokens,
           user: `${user}\n\nYour previous reply was not valid. Problems: ${parsed.errors.slice(0, 8).join('; ')}.\nReturn ONLY the JSON object described in the instructions.`,
           context,
         });
